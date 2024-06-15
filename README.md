@@ -43,6 +43,10 @@ npm install --save-dev eslint @eslint/js @types/eslint__js typescript typescript
 - Its primary purpose is to ensure consistent behavior across different platforms (Windows, macOS,
   Linux)
 
+## morgan
+
+- HTTP request logger middleware.
+
 ## Authenticate for using the gcloud CLI
 
 https://cloud.google.com/docs/authentication/gcloud
