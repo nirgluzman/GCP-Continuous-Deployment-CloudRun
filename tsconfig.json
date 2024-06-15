@@ -1,0 +1,20 @@
+{
+  "extends": "@tsconfig/node22/tsconfig.json",
+
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig to read more about this file */
+
+    "lib": ["ESNext"] /* library APIs to be available in your runtime environment. */,
+    "outDir": "dist" /* Specify an output folder for all emitted files. */,
+    "rootDir": "src" /* Specify the root folder within your source files. */,
+    "baseUrl": "." /* Sets a base directory from which to resolve bare specifier module names. */,
+    "typeRoots": [
+      "./node_modules/@types"
+    ] /* Specify multiple folders that act like './node_modules/@types'. */,
+    "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
+    "sourceMap": true /* Create source map files for emitted JavaScript files. */
+  },
+
+  "include": ["src/**/*.ts"] /* Files outside include will not be compiled. */,
+  "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"]
+}
