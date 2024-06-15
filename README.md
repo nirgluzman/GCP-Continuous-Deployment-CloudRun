@@ -4,7 +4,8 @@ GitHub -> CloudBuild (Build) -> CloudRun (Deploy)
 
 ## GitHub repo
 
-https://github.com/nirgluzman/GCP-Continuous-Deployment-CloudRun.git
+- https://github.com/nirgluzman/GCP-Continuous-Deployment-CloudRun.git
+- https://github.com/mrwade/ultimate-node-stack
 
 ## Resources
 
@@ -23,6 +24,18 @@ https://github.com/nirgluzman/GCP-Continuous-Deployment-CloudRun.git
 
 - https://swc.rs/docs/getting-started
 - https://swc.rs/docs/configuration/swcrc
+
+## ESLint
+
+- https://eslint.org/
+- https://typescript-eslint.io/getting-started/
+
+- ESLint is a static code analysis tool that checks your JavaScript code for common problems, such
+  as syntax errors, formatting issues, code style violations, and potential bugs.
+
+```bash
+npm install --save-dev eslint @eslint/js @types/eslint__js typescript typescript-eslint
+```
 
 ## rimraf
 
