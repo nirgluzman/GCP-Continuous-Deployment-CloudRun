@@ -15,5 +15,7 @@
     "type": "commonjs"
   },
 
-  "sourceMaps": "inline"
+  "sourceMaps": "inline",
+
+  "minify": true
 }
