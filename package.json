@@ -4,10 +4,10 @@
   "description": "Cloud Run demo app",
   "main": "server.js",
   "scripts": {
+    "build": "rimraf dist && swc ./src --out-dir dist --strip-leading-paths",
     "start": "node dist/server.js",
-    "dev": "nodemon dist/server.js",
-    "build": "rimraf dist && swc ./src -d dist --strip-leading-paths",
-    "start:docker": "npm run build && npm start"
+    "dev": "npm run build && npm start",
+    "watch": "nodemon --watch src --ext ts --exec \"npm run dev\""
   },
   "keywords": [],
   "author": "Nir Gluzman",
