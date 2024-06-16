@@ -1,4 +1,8 @@
 @url = http://localhost:3000/
+@url_cloudrun = https://backend-service-vlvb2yy53q-uc.a.run.app/
 
 ###
 GET {{url}}
+
+###
+GET {{url_cloudrun}}

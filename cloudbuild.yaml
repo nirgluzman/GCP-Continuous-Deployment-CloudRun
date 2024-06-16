@@ -1,0 +1,25 @@
+steps:
+  # Build the image & Submit to Container Registry (GCR)
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - builds
+      - submit
+      - '--tag=gcr.io/$PROJECT_ID/backend:latest'
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - run
+      - deploy
+      - 'backend-service'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--image=gcr.io/$PROJECT_ID/backend:latest'
+      - '--port=3000'
+      - '--command'
+      - 'npm,run,dev'
+
+# Store the build logs in Cloud Logging
+options:
+  logging: CLOUD_LOGGING_ONLY

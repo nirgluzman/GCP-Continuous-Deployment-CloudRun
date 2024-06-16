@@ -16,6 +16,8 @@ GitHub -> CloudBuild (Build) -> CloudRun (Deploy)
 - https://www.youtube.com/watch?v=GhSAQ19f4HA (Continuous Deployment with Cloud Run)
 - https://www.youtube.com/watch?v=NCa0RTSUEFQ (Continuous Deployment to Cloud Run using GitHub
   Actions)
+- https://medium.com/@williamwarley/guide-for-gcp-cloud-build-c2ea264a7f97 (Complete Guide for Cloud
+  Build)
 
 ## Centralized Recommendations for TSConfig bases
 
@@ -104,4 +106,69 @@ https://cloud.google.com/sdk/gcloud/reference/config/set
 ```bash
 gcloud config configurations list # lists existing named configurations
 gcloud config set # set properties in your active configuration
+```
+
+## Cloud Build
+
+1. Enable Cloud Build API
+2. Cloud Build trigger > Connect Repository
+3. Create Trigger > Dockerfile/Cloud Build configuration file,
+   https://cloud.google.com/build/docs/automating-builds/create-manage-triggers
+4. Cloud Build service account, https://cloud.google.com/build/docs/cloud-build-service-account
+
+- Cloud Build configuration file:
+
+```yaml
+steps:
+  # Build the image
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '--tag=gcr.io/$PROJECT_ID/backend:latest'
+      - '-f=Dockerfile'
+      - .
+
+  # Push the image to a container registry
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - 'gcr.io/$PROJECT_ID/backend:latest'
+
+# Store the build logs in Cloud Logging
+options:
+  logging: CLOUD_LOGGING_ONLY
+```
+
+## Cloud Run
+
+1. Enable Cloud Run API
+
+## Cloud Build with integration to Cloud Run
+
+```yaml
+steps:
+  # Build the image & Submit to Container Registry (GCR)
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - builds
+      - submit
+      - '--tag=gcr.io/$PROJECT_ID/backend:latest'
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - run
+      - deploy
+      - 'backend-service'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--image=gcr.io/$PROJECT_ID/backend:latest'
+      - '--port=3000'
+      - '--command'
+      - 'npm,run,dev'
+
+# Store the build logs in Cloud Logging
+options:
+  logging: CLOUD_LOGGING_ONLY
 ```
