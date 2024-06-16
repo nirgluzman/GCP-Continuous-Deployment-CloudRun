@@ -1,0 +1,43 @@
+name: Deploy to Cloud Run
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  REGION: us-central1
+  APP_NAME: demo-app
+  REGISTRY_NAME: cloudrun
+
+jobs:
+  build-and-deploy:
+    name: Build Docker image and Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout repository code'
+        uses: actions/checkout@v4
+
+      - name: 'Authenticate to Google Cloud'
+        uses: google-github-actions/auth@v2.1.3
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      # Build and push image to Google Container Registry
+      - name: Build
+        run: |-
+          gcloud builds submit \
+          --tag gcr.io/${secrets.GCP_CREDENTIALS.project_id}/$APP_NAME:$GITHUB_SHA
+
+      - name: Deploy
+        run: |
+          gcloud run deploy $APP_NAME \
+          --region $REGION \
+          --platform managed \
+          --allow-unauthenticated \
+          --image gcr.io/${secrets.GCP_CREDENTIALS.project_id}/$APP_NAME:$GITHUB_SHA \
+          --port=3000 \
+          --command='npm,run,dev'
