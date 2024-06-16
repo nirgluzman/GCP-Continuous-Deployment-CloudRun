@@ -60,6 +60,7 @@ jobs:
         uses: docker/build-push-action@v5.4.0
         with:
           push: true
+          context: ./
           tags: ${{ env.IMAGE }}
 
       # Deploy image to Cloud Run
