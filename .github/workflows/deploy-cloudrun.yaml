@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_CREDENTIALS.project_id }}
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: us-central1
   APP_NAME: demo-app
 
@@ -29,15 +29,15 @@ jobs:
       # Build and push image to Google Container Registry
       - name: Build
         run: |-
-          'gcloud builds submit \
-          --tag gcr.io/$PROJECT_ID/$APP_NAME:$GITHUB_SHA'
+          gcloud builds submit \
+          --tag gcr.io/$PROJECT_ID/$APP_NAME:$GITHUB_SHA
 
       - name: Deploy
         run: |
-          'gcloud run deploy $APP_NAME \
+          gcloud run deploy $APP_NAME \
           --region $REGION \
           --platform managed \
           --allow-unauthenticated \
           --image gcr.io/$PROJECT_ID/$APP_NAME:$GITHUB_SHA \
           --port=3000 \
-          --command="npm,run,dev"'
+          --command="npm,run,dev"
