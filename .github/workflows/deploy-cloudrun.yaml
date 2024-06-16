@@ -53,13 +53,12 @@ jobs:
           username: _json_key
           password: ${{ secrets.GCP_CREDENTIALS }}
 
-      # Build the container image and push it to GCR
+      # Build the Docker image and push it to GCR
       - name: Build and push to GCR
         uses: docker/build-push-action@v5.4.0
         with:
-          file: ./Dockerfile
           push: true
-          tags: gcr.io/$PROJECT_ID/$APP_NAME:$GITHUB_SHA
+          tags: gcr.io/$PROJECT_ID/$APP_NAME:latest
 
       # Deploy image to Cloud Run
       - name: Deploy
@@ -68,6 +67,6 @@ jobs:
           --region $REGION \
           --platform managed \
           --allow-unauthenticated \
-          --image gcr.io/$PROJECT_ID/$APP_NAME:$GITHUB_SHA \
+          --image gcr.io/$PROJECT_ID/$APP_NAME:latest \
           --port=3000 \
           --command="npm,run,dev"
