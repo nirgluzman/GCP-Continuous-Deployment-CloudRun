@@ -173,7 +173,7 @@ options:
   logging: CLOUD_LOGGING_ONLY
 ```
 
-## Build & Deploy to Cloud Run using GitHub Actions
+## Build to GCR and Deploy to Cloud Run using GitHub Actions
 
 - https://www.youtube.com/watch?v=NCa0RTSUEFQ
 
@@ -226,23 +226,26 @@ jobs:
     name: Build Docker image and Deploy to Cloud Run
     runs-on: ubuntu-latest
     steps:
+      # Clone the GitHub repository
       - name: 'Checkout repository code'
         uses: actions/checkout@v4
 
       - name: 'Authenticate to Google Cloud'
         uses: google-github-actions/auth@v2.1.3
         with:
+          # Service account based authentication
           credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'
 
-      # Build and push image to Google Container Registry
+      # Build and push image to GCR using `gcloud builds submit` command
       - name: Build
-        run: |-
+        run: |
           gcloud builds submit \
           --tag gcr.io/$PROJECT_ID/$APP_NAME:$GITHUB_SHA
 
+      # Deploy image to Cloud Run
       - name: Deploy
         run: |
           gcloud run deploy $APP_NAME \
@@ -252,4 +255,48 @@ jobs:
           --image gcr.io/$PROJECT_ID/$APP_NAME:$GITHUB_SHA \
           --port=3000 \
           --command="npm,run,dev"
+```
+
+### Docker Build & push to GCR
+
+https://github.com/marketplace/actions/docker-login
+https://github.com/marketplace/actions/build-and-push-docker-images
+
+NOTE: Use of Environment Variables in docker/build-push-action
+https://github.com/docker/build-push-action/discussions/1097
+
+- Build the image on GitHub Actions Runner and push it to GCR
+
+```yaml
+name: Deploy to Cloud Run
+...
+...
+jobs:
+  build-and-deploy:
+    name: Build Docker image and Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    env:
+      # IMAGE: gcr.io/$PROJECT_ID/$APP_NAME:$GITHUB_SHA
+      IMAGE: gcr.io/cloudrun-demo-app/demo-app:latest
+    steps:
+    ...
+    # Setting up Docker Buildx (required for build-push action)
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3.3.0
+
+    - name: Login to GCR
+      uses: docker/login-action@v3.2.0
+      with:
+        registry: gcr.io
+        # Service account based authentication
+        username: _json_key
+        password: ${{ secrets.GCP_CREDENTIALS }}
+
+    # Build the Docker image and push it to GCR
+    - name: Build and push to GCR
+      uses: docker/build-push-action@v5.4.0
+      with:
+        push: true
+        tags: ${{ env.IMAGE }}
+...
 ```
