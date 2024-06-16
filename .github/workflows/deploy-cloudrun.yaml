@@ -14,6 +14,8 @@ jobs:
   build-and-deploy:
     name: Build Docker image and Deploy to Cloud Run
     runs-on: ubuntu-latest
+    env:
+      IMAGE: gcr.io/$PROJECT_ID/$APP_NAME:$GITHUB_SHA
     steps:
       # Clone the GitHub repository
       - name: Checkout repository code
@@ -35,7 +37,7 @@ jobs:
       # - name: Build
       #   run: |
       #     gcloud builds submit \
-      #     --tag gcr.io/$PROJECT_ID/$APP_NAME:$GITHUB_SHA
+      #     --tag ${{ env.IMAGE }}
 
       ###
       # Build the image on GitHub Actions Runner and push it to GCR
@@ -58,7 +60,7 @@ jobs:
         uses: docker/build-push-action@v5.4.0
         with:
           push: true
-          tags: gcr.io/$PROJECT_ID/$APP_NAME:latest
+          tags: ${{ env.IMAGE }}
 
       # Deploy image to Cloud Run
       - name: Deploy
@@ -67,6 +69,6 @@ jobs:
           --region $REGION \
           --platform managed \
           --allow-unauthenticated \
-          --image gcr.io/$PROJECT_ID/$APP_NAME:latest \
+          --image ${{ env.IMAGE }} \
           --port=3000 \
           --command="npm,run,dev"
