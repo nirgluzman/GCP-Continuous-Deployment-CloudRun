@@ -29,15 +29,15 @@ jobs:
       # Build and push image to Google Container Registry
       - name: Build
         run: |-
-          gcloud builds submit \
-          --tag gcr.io/${secrets.GCP_CREDENTIALS.project_id}/$APP_NAME:$GITHUB_SHA
+          'gcloud builds submit \
+          --tag gcr.io/${secrets.GCP_CREDENTIALS.project_id}/$APP_NAME:$GITHUB_SHA'
 
       - name: Deploy
         run: |
-          gcloud run deploy $APP_NAME \
+          'gcloud run deploy $APP_NAME \
           --region $REGION \
           --platform managed \
           --allow-unauthenticated \
           --image gcr.io/${secrets.GCP_CREDENTIALS.project_id}/$APP_NAME:$GITHUB_SHA \
           --port=3000 \
-          --command='npm,run,dev'
+          --command="npm,run,dev"'
