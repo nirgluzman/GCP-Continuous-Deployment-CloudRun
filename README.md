@@ -172,3 +172,84 @@ steps:
 options:
   logging: CLOUD_LOGGING_ONLY
 ```
+
+## Build & Deploy to Cloud Run using GitHub Actions
+
+- https://www.youtube.com/watch?v=NCa0RTSUEFQ
+
+1. Create a Service Account with the following roles attached:
+
+- Cloud Run Admin
+- Service Account User -> be able to grant the service account used by Cloud Run to pull image from
+  GCR
+- Cloud Build Service Account -> required by `gcloud builds submit` command
+- Viewer -> for streaming logs during build to the default logs bucket
+
+```bash
+gcloud iam service-accounts list
+```
+
+2. Create a service account key .json file
+
+- https://cloud.google.com/iam/docs/keys-create-delete
+
+```bash
+gcloud iam service-accounts keys create \
+./sa-private-key.json \
+--iam-account=github-actions@cloudrun-demo-app.iam.gserviceaccount.com
+```
+
+3. Create the following secrets as Repository Secrets:
+
+```code
+GCP_CREDENTIALS -> sa-private-key.json
+GCP_PROJECT_ID
+```
+
+4. GitHub Action workflow file
+
+```yaml
+name: Deploy to Cloud Run
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-central1
+  APP_NAME: demo-app
+
+jobs:
+  build-and-deploy:
+    name: Build Docker image and Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout repository code'
+        uses: actions/checkout@v4
+
+      - name: 'Authenticate to Google Cloud'
+        uses: google-github-actions/auth@v2.1.3
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      # Build and push image to Google Container Registry
+      - name: Build
+        run: |-
+          gcloud builds submit \
+          --tag gcr.io/$PROJECT_ID/$APP_NAME:$GITHUB_SHA
+
+      - name: Deploy
+        run: |
+          gcloud run deploy $APP_NAME \
+          --region $REGION \
+          --platform managed \
+          --allow-unauthenticated \
+          --image gcr.io/$PROJECT_ID/$APP_NAME:$GITHUB_SHA \
+          --port=3000 \
+          --command="npm,run,dev"
+```
