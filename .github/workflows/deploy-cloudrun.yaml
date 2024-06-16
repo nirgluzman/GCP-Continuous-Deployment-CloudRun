@@ -15,7 +15,8 @@ jobs:
     name: Build Docker image and Deploy to Cloud Run
     runs-on: ubuntu-latest
     env:
-      IMAGE: gcr.io/$PROJECT_ID/$APP_NAME:$GITHUB_SHA
+      # IMAGE: gcr.io/$PROJECT_ID/$APP_NAME:$GITHUB_SHA
+      IMAGE: gcr.io/cloudrun-demo-app/demo-app:latest
     steps:
       # Clone the GitHub repository
       - name: Checkout repository code
