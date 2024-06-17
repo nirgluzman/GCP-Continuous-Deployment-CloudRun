@@ -173,11 +173,13 @@ options:
   logging: CLOUD_LOGGING_ONLY
 ```
 
-## Build to GCR and Deploy to Cloud Run using GitHub Actions
+## Build to GCR and Deploy to Cloud Run using 'gcloud builds submit''
 
 - https://www.youtube.com/watch?v=NCa0RTSUEFQ
 
 1. Create a Service Account with the following roles attached:
+
+https://stackoverflow.com/staging-ground/78630149
 
 - Cloud Run Admin
 - Service Account User -> be able to grant the service account used by Cloud Run to pull image from
@@ -257,15 +259,14 @@ jobs:
           --command="npm,run,dev"
 ```
 
-### Docker Build & push to GCR
+### Build the image on GitHub Actions Runner and push it to GCR
 
 https://github.com/marketplace/actions/docker-login
 https://github.com/marketplace/actions/build-and-push-docker-images
 
-NOTE: Use of Environment Variables in docker/build-push-action
+NOTE: Use of Environment Variables in docker/build-push-action:
 https://github.com/docker/build-push-action/discussions/1097
-
-- Build the image on GitHub Actions Runner and push it to GCR
+https://stackoverflow.com/staging-ground/78630520
 
 ```yaml
 name: Deploy to Cloud Run
